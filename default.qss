@@ -1,0 +1,54 @@
+* {
+    background-color: #f2f2f2;
+    font-family: 'UbuntuMono';
+}
+
+QPushButton { 
+    font-size: 44px;
+    border: 0px;
+    color: #f2f2f2;
+}
+
+QPushButton#number {
+    background-color: #001733;
+}
+
+QPushButton#number:hover {
+    background-color: rgba(0, 23, 51, .97);
+}
+
+QPushButton#rightBar {
+    background: qlineargradient(x1:0, y1:0, x2:1.5, y2:0
+    stop: 0 rgba(0, 23, 51, 1)
+    stop: 1 rgba(0, 78, 102, 1)
+    );
+}
+
+QPushButton#rightBar:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1.5, y2:0
+    stop: 0 rgba(0, 23, 51, .97)
+    stop: 1 rgba(0, 78, 102, .97)
+    );
+}
+
+QPushButton#equal {
+    color: rgba(0, 78, 102, 1);
+}
+
+QPushButton#equal:hover {
+    background-color: #e2e2e2;
+}
+
+QLineEdit#form {
+    border: 0px;
+    font-size: 72px;
+    padding: 20px 22px;
+    color: #001733;
+}
+
+QLabel {
+    font-size: 28px;
+    margin-top: 40px;
+    margin-right: 22px;
+    color: #004e66;
+}
