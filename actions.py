@@ -1,4 +1,17 @@
 from PyQt5.QtWidgets import QLineEdit
+import re
+import math
+
+# Defining the information of each operator in a tuple (priority, associativity). left=1, right=0
+operators = {
+    '(': (-1, 1),
+    ')': (-1, 1),
+    '+': (1, 1),
+    '-': (1, 1),
+    '*': (2, 1),
+    '/': (2, 1),
+    '^': (3, 0)
+}
 
 def onClick(s, form):
     if isinstance(form, QLineEdit):
@@ -7,7 +20,7 @@ def onClick(s, form):
         form.setFocus()
 
 def onClickCalc(form, label):
-    res = str(evaluate(form.text()))
+    res = str(solve(form.text()))
     label.setText(form.text())
     form.setText(res)
     form.setFocus()
@@ -16,52 +29,70 @@ def onClickDelete(form):
     form.setText("")
     form.setFocus()
 
-def evaluate(s):
-    numStack = []
-    opStack = []
-    operators = ["+", "-", "*", "/", "(", ")"]
 
-    word = ""
-    for ch in s:
-        if ch not in operators:
-            word += ch
+def __to_rpn(s: str):
+    stack = []
+    rpn = ""
+
+    for i in range(len(s)):
+        if s[i].isspace():
+            continue
+
+        elif re.match('[\-\.]?[0-9]', s[i:]):
+            rpn += s[i]
+
+        elif s[i] == ')':
+            while stack and stack[-1] != '(':
+                rpn += ' ' + stack.pop() + ' '
+            stack.pop()
+
+        elif s[i] == '(':
+            stack.append(s[i])
+
+        elif operators.get(s[i]): #Check to see if the operator exists 
+            rpn += ' '
+            p_now, a_now = operators[s[i]]
+            if stack: p_last, _ = operators[stack[-1]]
+            while stack and p_now <= p_last and a_now:
+                rpn += stack.pop() + ' '
+            stack.append(s[i])
+
         else:
-            try:
-                if word != "":
-                    numStack.append(float(word))
-                word = ""
-                if ch == ")":
-                    x = numStack.pop()
-                    y = numStack.pop()
-                    numStack.append(__evaluate(opStack.pop(), x, y))
+            raise Exception()
 
-                elif ch == "(":
-                    pass
+    while stack:
+        rpn += ' ' + stack.pop()
 
-                else:
-                    opStack.append(ch)
+    return rpn
 
-            except ValueError:
-                print("Error") # Debug only
-                openErrorDialog("You entered something wrong.")
-                return ""
+def __rpn_solve(s):
+    s = s.split()
+    stack = []
+    for x in s:
+        try:
+            stack.append(float(x))
+        except ValueError: #means it is an operand
+            a = stack.pop()
+            # Unary operations
+            if x == '%':
+                stack.append(a/100)
+                continue
 
-    return numStack.pop()
-
-def openErrorDialog(msg):
-    pass
-
-def __evaluate(op, x, y):
-    if op == "+":
-        return x + y
+            b = stack.pop()
+            if x == '+':
+                stack.append(a+b)
+            elif x == '-':
+                stack.append(b-a)
+            elif x == '*':
+                stack.append(a*b)
+            elif x == "/":
+                stack.append(b/a)
+            elif x == '^':
+                stack.append(b**a)
     
-    elif op == "-":
-        return y - x
+    return stack.pop()
 
-    elif op == "*":
-        return x * y
 
-    elif op == "/":
-        return y/x
-    
-    raise ValueError
+def solve(s):
+    rpn = __to_rpn(s)
+    return __rpn_solve(rpn)
